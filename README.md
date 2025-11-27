@@ -33,56 +33,56 @@ __Algorithm:__
 6. Plot the Signals: Use Matplotlib to plot the message signal, carrier signal, and modulated signal.
 
 __Programme:__
-```c
-# FM USING PYTHON
-
 
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.signal import hilbert
 
-Am = 32.6
-fm = 570
-Ac = 16.3
-fc = 5700
-fs = 90000
-t = np.arange(0, 3/fm, 1/fs)
-m = Am * np.cos(2 * 3.14 * fm * t)
-plt.subplot(3,1,1)
-plt.plot(t, m)
-plt.title("Message Signal")
-plt.xlabel("Time")
-plt.ylabel("Amplitude")
-c = Ac * np.cos(2 * 3.14 * fc * t)
-plt.subplot(3,1,2)
-plt.plot(t, c)
-plt.title("Carrier Signal")
-plt.xlabel("Time")
-plt.ylabel("Amplitude")
-df = 2000
-beta = df / fm
-print("Modulation Index (β) =", beta)
-s = Ac * np.cos(2 * 3.14 * fc * t + beta * np.sin(2 * 3.14 * fm * t))
-plt.subplot(3,1,3)
-plt.plot(t, s)
-plt.title("Frequency Modulated Signal")
-plt.xlabel("Time")
-plt.ylabel("Amplitude")
+Fs = 5000  # Sampling frequency
+Fc = 200   # Carrier frequency
+f_mod = 20  # Modulating signal frequency
+Am = 1.0    # Amplitude of the modulating signal
+kf = 50     # Frequency deviation constant
+t = np.arange(0, 1, 1/Fs)  
+modulating_signal = Am * np.cos(2 * np.pi * f_mod * t)
+integral_of_message = np.cumsum(modulating_signal) / Fs
+carrier = np.cos(2 * np.pi * Fc * t + 2 * np.pi * kf * integral_of_message)
+plt.figure(figsize=(10, 8))
+
+plt.subplot(3, 1, 1)
+plt.plot(t, modulating_signal)
+plt.title('Modulating Signal (Message)')
+plt.xlabel('Time (s)')
+plt.ylabel('Amplitude')
+
+plt.subplot(3, 1, 2)
+plt.plot(t, carrier)
+plt.title('FM Modulated Signal')
+plt.xlabel('Time (s)')
+plt.ylabel('Amplitude')
+
+analytic_signal = hilbert(carrier)
+instantaneous_phase = np.unwrap(np.angle(analytic_signal))
+instantaneous_frequency = np.diff(instantaneous_phase) * Fs / (2 * np.pi)
+
+
+t_demod = t[1:]
+
+plt.subplot(3, 1, 3)
+plt.plot(t_demod, instantaneous_frequency - Fc)  # Subtract carrier frequency
+plt.title('Demodulated Signal (Recovered Message)')
+plt.xlabel('Time (s)')
+plt.ylabel('Frequency (Hz)')
+
 plt.tight_layout()
 plt.show()
 
-```
-
 __Tabulation:__
-
-<img width="1200" height="1600" alt="image" src="https://github.com/user-attachments/assets/a06367c6-f190-42ca-806b-71e48dd2140d" />
-
+<img width="1152" height="864" alt="image" src="https://github.com/user-attachments/assets/86735d35-0da9-411b-a4fc-7575d1fe510f" />
 
 
 __Output:__
-
-<img width="630" height="469" alt="download (1)" src="https://github.com/user-attachments/assets/ec6da3a7-6417-47b2-ba07-37c7d71d4189" />
-
+<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/c2c71bdc-d74f-456e-949b-6ccd4c25a91f" />
 
 __Result:__
-
-The message signal, carrier signal, and frequency modulated (FM) signal will be displayed in separate plots. The modulated signal will show frequency variations corresponding to the amplitude of the message signal.
+Thus the Frequency Modulation and Demodulation using NumPy and Matplotlib is verified successfully.
